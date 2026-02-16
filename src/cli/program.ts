@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { createAccountCommand } from '../commands/account/index.js';
 
 export function createProgram(): Command {
   const program = new Command();
@@ -11,6 +12,8 @@ export function createProgram(): Command {
     .option('--testnet', 'Use testnet', false)
     .option('--account <id>', 'Use specific account')
     .option('--category <type>', 'Category: linear, spot, inverse, option', 'linear');
+
+  program.addCommand(createAccountCommand());
 
   return program;
 }
