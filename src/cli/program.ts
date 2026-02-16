@@ -1,5 +1,7 @@
 import { Command } from 'commander';
 import { createAccountCommand } from '../commands/account/index.js';
+import { createMarketsCommand } from '../commands/markets/index.js';
+import { createAssetCommand } from '../commands/asset/index.js';
 
 export function createProgram(): Command {
   const program = new Command();
@@ -14,6 +16,8 @@ export function createProgram(): Command {
     .option('--category <type>', 'Category: linear, spot, inverse, option', 'linear');
 
   program.addCommand(createAccountCommand());
+  program.addCommand(createMarketsCommand());
+  program.addCommand(createAssetCommand());
 
   return program;
 }
