@@ -1,10 +1,14 @@
 import { Command } from 'commander';
 import { AccountStore } from '../../lib/db/accounts.js';
 import { getConfig } from '../../lib/config.js';
+import { createRestClient } from '../../lib/bybit.js';
 import { addAccount } from './add.js';
 import { listAccounts } from './ls.js';
 import { removeAccount } from './remove.js';
 import { setDefaultAccount } from './set-default.js';
+import { fetchAndDisplayBalances } from './balances.js';
+import { fetchAndDisplayPositions } from './positions.js';
+import { fetchAndDisplayOrders } from './orders.js';
 
 /**
  * Create the `account` command group with all subcommands.
@@ -65,6 +69,63 @@ export function createAccountCommand(): Command {
       const store = new AccountStore(config.dataDir);
       try {
         setDefaultAccount(store, name);
+      } finally {
+        store.close();
+      }
+    });
+
+  account
+    .command('balances')
+    .description('Show wallet balances')
+    .action(async () => {
+      const config = getConfig(account.parent?.opts() ?? {});
+      const store = new AccountStore(config.dataDir);
+      try {
+        const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
+        if (!acct) {
+          console.error("No account configured. Run 'bb account add' first.");
+          return;
+        }
+        const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
+        await fetchAndDisplayBalances(client, 'UNIFIED', config.jsonOutput);
+      } finally {
+        store.close();
+      }
+    });
+
+  account
+    .command('positions')
+    .description('Show open positions')
+    .action(async () => {
+      const config = getConfig(account.parent?.opts() ?? {});
+      const store = new AccountStore(config.dataDir);
+      try {
+        const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
+        if (!acct) {
+          console.error("No account configured. Run 'bb account add' first.");
+          return;
+        }
+        const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
+        await fetchAndDisplayPositions(client, config.category, config.jsonOutput);
+      } finally {
+        store.close();
+      }
+    });
+
+  account
+    .command('orders')
+    .description('Show open orders')
+    .action(async () => {
+      const config = getConfig(account.parent?.opts() ?? {});
+      const store = new AccountStore(config.dataDir);
+      try {
+        const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
+        if (!acct) {
+          console.error("No account configured. Run 'bb account add' first.");
+          return;
+        }
+        const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
+        await fetchAndDisplayOrders(client, config.category, config.jsonOutput);
       } finally {
         store.close();
       }
