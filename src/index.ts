@@ -1,2 +1,5 @@
 #!/usr/bin/env node
-console.log('bb: bybit-cli v0.1.0');
+import { createProgram } from './cli/program.js';
+
+const program = createProgram();
+program.parse();

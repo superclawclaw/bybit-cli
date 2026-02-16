@@ -50,7 +50,9 @@ export function outputResult<T>(options: OutputOptions<T>): void {
     return;
   }
 
-  const items = Array.isArray(options.data) ? options.data : [options.data];
+  const items: readonly T[] = Array.isArray(options.data)
+    ? (options.data as readonly T[])
+    : [options.data as T];
   const rows = items.map(options.toRow);
   console.log(formatTable(options.headers, rows));
 }
