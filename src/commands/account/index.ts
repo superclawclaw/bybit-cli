@@ -9,6 +9,7 @@ import { setDefaultAccount } from './set-default.js';
 import { fetchAndDisplayBalances } from './balances.js';
 import { fetchAndDisplayPositions } from './positions.js';
 import { fetchAndDisplayOrders } from './orders.js';
+import { fetchAndDisplayPortfolio } from './portfolio.js';
 
 /**
  * Create the `account` command group with all subcommands.
@@ -126,6 +127,25 @@ export function createAccountCommand(): Command {
         }
         const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
         await fetchAndDisplayOrders(client, config.category, config.jsonOutput);
+      } finally {
+        store.close();
+      }
+    });
+
+  account
+    .command('portfolio')
+    .description('Show combined balances and positions')
+    .action(async () => {
+      const config = getConfig(account.parent?.opts() ?? {});
+      const store = new AccountStore(config.dataDir);
+      try {
+        const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
+        if (!acct) {
+          console.error("No account configured. Run 'bb account add' first.");
+          return;
+        }
+        const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
+        await fetchAndDisplayPortfolio(client, 'UNIFIED', config.category, config.jsonOutput);
       } finally {
         store.close();
       }
