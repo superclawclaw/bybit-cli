@@ -11,6 +11,7 @@ import { cancelOrder } from './cancel.js';
 import { cancelAllOrders } from './cancel-all.js';
 import { setLeverage } from './set-leverage.js';
 import { amendOrder } from './amend.js';
+import { loadOrderConfig, saveOrderConfig, displayOrderConfig } from './configure.js';
 import { ApiKeyNotFoundError, handleError } from '../../lib/errors.js';
 
 function resolveAccount(config: ReturnType<typeof getConfig>) {
@@ -189,6 +190,31 @@ export function createTradeCommand(): Command {
       } finally {
         store?.close();
       }
+    });
+
+  order
+    .command('configure')
+    .description('Show or update order defaults')
+    .option('--slippage <percent>', 'Default slippage percentage for market orders')
+    .option('--tif <tif>', 'Default time in force: GTC, IOC, PostOnly')
+    .option('--confirm <bool>', 'Confirm before submitting orders (true/false)')
+    .action((opts: { slippage?: string; tif?: string; confirm?: string }) => {
+      const config = getConfig(trade.parent?.opts() ?? {});
+      const current = loadOrderConfig(config.dataDir);
+      const hasUpdates = opts.slippage !== undefined || opts.tif !== undefined || opts.confirm !== undefined;
+
+      if (!hasUpdates) {
+        displayOrderConfig(current, config.jsonOutput);
+        return;
+      }
+
+      const updated = {
+        slippage: opts.slippage !== undefined ? Number(opts.slippage) : current.slippage,
+        defaultTimeInForce: opts.tif !== undefined ? opts.tif : current.defaultTimeInForce,
+        confirmBeforeSubmit: opts.confirm !== undefined ? opts.confirm === 'true' : current.confirmBeforeSubmit,
+      };
+      saveOrderConfig(config.dataDir, updated);
+      displayOrderConfig(updated, config.jsonOutput);
     });
 
   trade.addCommand(order);
