@@ -1,18 +1,46 @@
 {
   "name": "bybit-cli",
   "version": "0.1.0",
-  "description": "Bybit DEX CLI tool",
+  "description": "Command-line interface for Bybit exchange with multi-account management, real-time monitoring, and full trading support",
   "type": "module",
   "bin": {
     "bb": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "SKILLS.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:watch": "vitest",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "pnpm build"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/bybit-cli/bybit-cli.git"
+  },
+  "homepage": "https://github.com/bybit-cli/bybit-cli#readme",
+  "bugs": {
+    "url": "https://github.com/bybit-cli/bybit-cli/issues"
+  },
+  "keywords": [
+    "bybit",
+    "cli",
+    "trading",
+    "crypto",
+    "cryptocurrency",
+    "perpetual",
+    "futures",
+    "dex",
+    "terminal",
+    "tui"
+  ],
+  "author": "Derek",
   "dependencies": {
     "@inquirer/prompts": "^8.2.1",
     "better-sqlite3": "^11.8.1",
