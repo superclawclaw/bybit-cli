@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { createAccountCommand } from '../commands/account/index.js';
 import { createMarketsCommand } from '../commands/markets/index.js';
 import { createAssetCommand } from '../commands/asset/index.js';
+import { createTradeCommand } from '../commands/trade/index.js';
 
 export function createProgram(): Command {
   const program = new Command();
@@ -18,6 +19,7 @@ export function createProgram(): Command {
   program.addCommand(createAccountCommand());
   program.addCommand(createMarketsCommand());
   program.addCommand(createAssetCommand());
+  program.addCommand(createTradeCommand());
 
   return program;
 }
