@@ -3,7 +3,11 @@ import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { AccountStore } from '../../lib/db/accounts.js';
-import { addAccount } from './add.js';
+import { addAccount, testConnectivity } from './add.js';
+
+vi.mock('../../lib/bybit.js', () => ({
+  createRestClient: vi.fn(),
+}));
 
 describe('addAccount', () => {
   let tempDir: string;
@@ -65,5 +69,70 @@ describe('addAccount', () => {
 
     const allOutput = consoleSpy.mock.calls.map((c) => String(c[0])).join('\n');
     expect(allOutput).not.toContain('my-very-secret-value');
+  });
+});
+
+describe('testConnectivity', () => {
+  beforeEach(() => {
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('returns success when API call succeeds', async () => {
+    const { createRestClient } = await import('../../lib/bybit.js');
+    const mockClient = {
+      getWalletBalance: vi.fn().mockResolvedValue({ retCode: 0, retMsg: 'OK' }),
+    };
+    vi.mocked(createRestClient).mockReturnValue(mockClient as never);
+
+    const result = await testConnectivity('key', 'secret', false);
+
+    expect(result.success).toBe(true);
+    expect(result.error).toBeUndefined();
+  });
+
+  it('returns failure when API returns error code', async () => {
+    const { createRestClient } = await import('../../lib/bybit.js');
+    const mockClient = {
+      getWalletBalance: vi.fn().mockResolvedValue({ retCode: 10003, retMsg: 'Invalid API key' }),
+    };
+    vi.mocked(createRestClient).mockReturnValue(mockClient as never);
+
+    const result = await testConnectivity('bad-key', 'bad-secret', false);
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Invalid API key');
+  });
+
+  it('returns failure when API call throws', async () => {
+    const { createRestClient } = await import('../../lib/bybit.js');
+    const mockClient = {
+      getWalletBalance: vi.fn().mockRejectedValue(new Error('Network error')),
+    };
+    vi.mocked(createRestClient).mockReturnValue(mockClient as never);
+
+    const result = await testConnectivity('key', 'secret', true);
+
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('Network error');
+  });
+
+  it('passes testnet flag to createRestClient', async () => {
+    const { createRestClient } = await import('../../lib/bybit.js');
+    const mockClient = {
+      getWalletBalance: vi.fn().mockResolvedValue({ retCode: 0, retMsg: 'OK' }),
+    };
+    vi.mocked(createRestClient).mockReturnValue(mockClient as never);
+
+    await testConnectivity('key', 'secret', true);
+
+    expect(createRestClient).toHaveBeenCalledWith({
+      apiKey: 'key',
+      apiSecret: 'secret',
+      testnet: true,
+    });
   });
 });

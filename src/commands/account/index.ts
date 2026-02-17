@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { AccountStore } from '../../lib/db/accounts.js';
 import { getConfig } from '../../lib/config.js';
 import { createRestClient } from '../../lib/bybit.js';
-import { addAccount } from './add.js';
+import { addAccount, interactiveAdd } from './add.js';
 import { listAccounts } from './ls.js';
 import { removeAccount } from './remove.js';
 import { setDefaultAccount } from './set-default.js';
@@ -20,15 +20,22 @@ export function createAccountCommand(): Command {
 
   account
     .command('add')
-    .description('Add a new account')
-    .argument('<name>', 'Account name')
-    .argument('<apiKey>', 'Bybit API key')
-    .argument('<apiSecret>', 'Bybit API secret')
-    .action((name: string, apiKey: string, apiSecret: string) => {
+    .description('Add a new account (interactive if no args)')
+    .argument('[name]', 'Account name')
+    .argument('[apiKey]', 'Bybit API key')
+    .argument('[apiSecret]', 'Bybit API secret')
+    .action(async (name?: string, apiKey?: string, apiSecret?: string) => {
       const config = getConfig(account.parent?.opts() ?? {});
       const store = new AccountStore(config.dataDir);
       try {
-        addAccount(store, name, apiKey, apiSecret);
+        if (name && apiKey && apiSecret) {
+          addAccount(store, name, apiKey, apiSecret);
+        } else if (!name && !apiKey && !apiSecret) {
+          await interactiveAdd(store, config.testnet);
+        } else {
+          console.error('Usage: bb account add <name> <apiKey> <apiSecret>');
+          console.error('       bb account add  (interactive mode)');
+        }
       } finally {
         store.close();
       }
