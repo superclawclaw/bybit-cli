@@ -11,14 +11,14 @@ import { cancelOrder } from './cancel.js';
 import { cancelAllOrders } from './cancel-all.js';
 import { setLeverage } from './set-leverage.js';
 import { amendOrder } from './amend.js';
+import { ApiKeyNotFoundError, handleError } from '../../lib/errors.js';
 
 function resolveAccount(config: ReturnType<typeof getConfig>) {
   const store = new AccountStore(config.dataDir);
   const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
   if (!acct) {
     store.close();
-    console.error("No account configured. Run 'bb account add' first.");
-    return { store, acct: null, client: null };
+    throw new ApiKeyNotFoundError();
   }
   const client = createRestClient({
     apiKey: acct.apiKey,
@@ -45,9 +45,11 @@ export function createTradeCommand(): Command {
     .option('--reduce-only', 'Reduce-only order', false)
     .action(async (side: string, size: string, coin: string, price: string, opts: { tif: string; reduceOnly: boolean }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         const validSide = side.charAt(0).toUpperCase() + side.slice(1).toLowerCase();
         if (validSide !== 'Buy' && validSide !== 'Sell') {
           console.error('Side must be "buy" or "sell".');
@@ -65,8 +67,10 @@ export function createTradeCommand(): Command {
           reduceOnly: opts.reduceOnly,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -79,9 +83,11 @@ export function createTradeCommand(): Command {
     .option('--reduce-only', 'Reduce-only order', false)
     .action(async (side: string, size: string, coin: string, opts: { reduceOnly: boolean }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         const validSide = side.charAt(0).toUpperCase() + side.slice(1).toLowerCase();
         if (validSide !== 'Buy' && validSide !== 'Sell') {
           console.error('Side must be "buy" or "sell".');
@@ -96,8 +102,10 @@ export function createTradeCommand(): Command {
           reduceOnly: opts.reduceOnly,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -112,9 +120,11 @@ export function createTradeCommand(): Command {
     .option('--reduce-only', 'Reduce-only order', false)
     .action(async (side: string, size: string, coin: string, price: string, trigger: string, opts: { reduceOnly: boolean }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         const validSide = side.charAt(0).toUpperCase() + side.slice(1).toLowerCase();
         if (validSide !== 'Buy' && validSide !== 'Sell') {
           console.error('Side must be "buy" or "sell".');
@@ -133,8 +143,10 @@ export function createTradeCommand(): Command {
           reduceOnly: opts.reduceOnly,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -149,9 +161,11 @@ export function createTradeCommand(): Command {
     .option('--reduce-only', 'Reduce-only order', false)
     .action(async (side: string, size: string, coin: string, price: string, trigger: string, opts: { reduceOnly: boolean }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         const validSide = side.charAt(0).toUpperCase() + side.slice(1).toLowerCase();
         if (validSide !== 'Buy' && validSide !== 'Sell') {
           console.error('Side must be "buy" or "sell".');
@@ -170,8 +184,10 @@ export function createTradeCommand(): Command {
           reduceOnly: opts.reduceOnly,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -185,17 +201,21 @@ export function createTradeCommand(): Command {
     .requiredOption('--coin <symbol>', 'Coin symbol (e.g. BTC)')
     .action(async (orderId: string, opts: { coin: string }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         await cancelOrder(client, {
           orderId,
           coin: validateSymbol(opts.coin),
           category: config.category,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -207,17 +227,21 @@ export function createTradeCommand(): Command {
     .option('-y, --yes', 'Skip confirmation', false)
     .action(async (opts: { coin?: string; yes: boolean }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         const coin = opts.coin ? validateSymbol(opts.coin) : undefined;
         await cancelAllOrders(client, {
           coin,
           category: config.category,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -229,9 +253,11 @@ export function createTradeCommand(): Command {
     .argument('<leverage>', 'Leverage multiplier (e.g. 10)')
     .action(async (coin: string, leverage: string) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         validatePositiveNumber(leverage, 'leverage');
         await setLeverage(client, {
           coin: validateSymbol(coin),
@@ -239,8 +265,10 @@ export function createTradeCommand(): Command {
           category: config.category,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 
@@ -254,9 +282,11 @@ export function createTradeCommand(): Command {
     .option('--qty <qty>', 'New quantity')
     .action(async (orderId: string, opts: { coin: string; price?: string; qty?: string }) => {
       const config = getConfig(trade.parent?.opts() ?? {});
-      const { store, client } = resolveAccount(config);
-      if (!client) return;
+      let store;
       try {
+        const resolved = resolveAccount(config);
+        store = resolved.store;
+        const { client } = resolved;
         await amendOrder(client, {
           orderId,
           coin: validateSymbol(opts.coin),
@@ -265,8 +295,10 @@ export function createTradeCommand(): Command {
           qty: opts.qty,
           jsonOutput: config.jsonOutput,
         });
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
-        store.close();
+        store?.close();
       }
     });
 

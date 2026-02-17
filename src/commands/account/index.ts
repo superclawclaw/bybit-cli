@@ -12,6 +12,7 @@ import { fetchAndDisplayOrders } from './orders.js';
 import { fetchAndDisplayPortfolio } from './portfolio.js';
 import { transformWalletUpdate, transformPositionUpdate, transformOrderUpdate } from './watch.js';
 import { buildWatchConfig } from '../../cli/ink/WatchApp.js';
+import { ApiKeyNotFoundError, handleError } from '../../lib/errors.js';
 
 /**
  * Create the `account` command group with all subcommands.
@@ -93,10 +94,7 @@ export function createAccountCommand(): Command {
       const store = new AccountStore(config.dataDir);
       try {
         const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
-        if (!acct) {
-          console.error("No account configured. Run 'bb account add' first.");
-          return;
-        }
+        if (!acct) { throw new ApiKeyNotFoundError(); }
         if (opts.watch) {
           const { renderComponent } = await import('../../cli/ink/render.js');
           const { WatchApp } = await import('../../cli/ink/WatchApp.js');
@@ -117,6 +115,8 @@ export function createAccountCommand(): Command {
         }
         const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
         await fetchAndDisplayBalances(client, 'UNIFIED', config.jsonOutput);
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
         if (!opts.watch) store.close();
       }
@@ -131,10 +131,7 @@ export function createAccountCommand(): Command {
       const store = new AccountStore(config.dataDir);
       try {
         const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
-        if (!acct) {
-          console.error("No account configured. Run 'bb account add' first.");
-          return;
-        }
+        if (!acct) { throw new ApiKeyNotFoundError(); }
         if (opts.watch) {
           const { renderComponent } = await import('../../cli/ink/render.js');
           const { WatchApp } = await import('../../cli/ink/WatchApp.js');
@@ -155,6 +152,8 @@ export function createAccountCommand(): Command {
         }
         const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
         await fetchAndDisplayPositions(client, config.category, config.jsonOutput);
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
         if (!opts.watch) store.close();
       }
@@ -169,10 +168,7 @@ export function createAccountCommand(): Command {
       const store = new AccountStore(config.dataDir);
       try {
         const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
-        if (!acct) {
-          console.error("No account configured. Run 'bb account add' first.");
-          return;
-        }
+        if (!acct) { throw new ApiKeyNotFoundError(); }
         if (opts.watch) {
           const { renderComponent } = await import('../../cli/ink/render.js');
           const { WatchApp } = await import('../../cli/ink/WatchApp.js');
@@ -193,6 +189,8 @@ export function createAccountCommand(): Command {
         }
         const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
         await fetchAndDisplayOrders(client, config.category, config.jsonOutput);
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
         if (!opts.watch) store.close();
       }
@@ -207,10 +205,7 @@ export function createAccountCommand(): Command {
       const store = new AccountStore(config.dataDir);
       try {
         const acct = config.accountId ? store.get(config.accountId) : store.getDefault();
-        if (!acct) {
-          console.error("No account configured. Run 'bb account add' first.");
-          return;
-        }
+        if (!acct) { throw new ApiKeyNotFoundError(); }
         if (opts.watch) {
           const { renderComponent } = await import('../../cli/ink/render.js');
           const { PortfolioWatch } = await import('../../cli/ink/components/PortfolioWatch.js');
@@ -221,6 +216,8 @@ export function createAccountCommand(): Command {
         }
         const client = createRestClient({ apiKey: acct.apiKey, apiSecret: acct.apiSecret, testnet: config.testnet });
         await fetchAndDisplayPortfolio(client, 'UNIFIED', config.category, config.jsonOutput);
+      } catch (err) {
+        handleError(err, config.jsonOutput);
       } finally {
         if (!opts.watch) store.close();
       }
