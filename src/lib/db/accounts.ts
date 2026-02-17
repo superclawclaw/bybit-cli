@@ -1,5 +1,6 @@
 import type Database from 'better-sqlite3';
 import { createDatabase } from './index.js';
+import { encrypt, decrypt, isEncrypted } from '../crypto.js';
 
 export interface Account {
   readonly name: string;
@@ -25,7 +26,7 @@ function rowToAccount(row: AccountRow): Account {
   return Object.freeze({
     name: row.name,
     apiKey: row.api_key,
-    apiSecret: row.api_secret,
+    apiSecret: decrypt(row.api_secret),
     isDefault: row.is_default === 1,
   });
 }
@@ -45,6 +46,7 @@ export class AccountStore {
   constructor(dataDir: string) {
     this.db = createDatabase(dataDir);
     this.db.exec(CREATE_TABLE_SQL);
+    this.migrateUnencryptedSecrets();
   }
 
   list(): readonly Account[] {
@@ -56,7 +58,7 @@ export class AccountStore {
   }
 
   add(input: AddAccountInput): void {
-    const existing = this.get(input.name);
+    const existing = this.getRaw(input.name);
     if (existing !== undefined) {
       throw new Error(`Account "${input.name}" already exists`);
     }
@@ -66,12 +68,13 @@ export class AccountStore {
       .get() as { readonly count: number };
 
     const isDefault = hasAny.count === 0 ? 1 : 0;
+    const encryptedSecret = encrypt(input.apiSecret);
 
     this.db
       .prepare(
         'INSERT INTO accounts (name, api_key, api_secret, is_default) VALUES (?, ?, ?, ?)'
       )
-      .run(input.name, input.apiKey, input.apiSecret, isDefault);
+      .run(input.name, input.apiKey, encryptedSecret, isDefault);
   }
 
   remove(name: string): void {
@@ -85,9 +88,7 @@ export class AccountStore {
   }
 
   get(name: string): Account | undefined {
-    const row = this.db
-      .prepare('SELECT name, api_key, api_secret, is_default FROM accounts WHERE name = ?')
-      .get(name) as AccountRow | undefined;
+    const row = this.getRaw(name);
 
     if (row === undefined) {
       return undefined;
@@ -124,5 +125,31 @@ export class AccountStore {
 
   close(): void {
     this.db.close();
+  }
+
+  private getRaw(name: string): AccountRow | undefined {
+    return this.db
+      .prepare('SELECT name, api_key, api_secret, is_default FROM accounts WHERE name = ?')
+      .get(name) as AccountRow | undefined;
+  }
+
+  private migrateUnencryptedSecrets(): void {
+    const rows = this.db
+      .prepare('SELECT name, api_secret FROM accounts')
+      .all() as readonly { readonly name: string; readonly api_secret: string }[];
+
+    const updateStmt = this.db.prepare(
+      'UPDATE accounts SET api_secret = ? WHERE name = ?'
+    );
+
+    const migrateTx = this.db.transaction(() => {
+      for (const row of rows) {
+        if (!isEncrypted(row.api_secret)) {
+          updateStmt.run(encrypt(row.api_secret), row.name);
+        }
+      }
+    });
+
+    migrateTx();
   }
 }

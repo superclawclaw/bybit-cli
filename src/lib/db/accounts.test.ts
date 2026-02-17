@@ -2,8 +2,10 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import Database from 'better-sqlite3';
 import { AccountStore } from './accounts.js';
 import type { Account, AddAccountInput } from './accounts.js';
+import { isEncrypted } from '../crypto.js';
 
 describe('AccountStore', () => {
   let tempDir: string;
@@ -181,5 +183,85 @@ describe('AccountStore', () => {
     const accounts = store.list();
 
     expect(Object.isFrozen(accounts)).toBe(true);
+  });
+
+  describe('encryption', () => {
+    it('stores api_secret encrypted in the database', () => {
+      store.add({ name: 'enc-test', apiKey: 'key-1', apiSecret: 'my-secret' });
+
+      // Read raw row from DB to verify encryption
+      const dbPath = join(tempDir, 'accounts.db');
+      const rawDb = new Database(dbPath, { readonly: true });
+      const row = rawDb.prepare('SELECT api_secret FROM accounts WHERE name = ?').get('enc-test') as { api_secret: string };
+      rawDb.close();
+
+      expect(isEncrypted(row.api_secret)).toBe(true);
+      expect(row.api_secret).not.toBe('my-secret');
+    });
+
+    it('decrypts api_secret transparently on read', () => {
+      store.add({ name: 'dec-test', apiKey: 'key-1', apiSecret: 'transparent-secret' });
+
+      const account = store.get('dec-test');
+      expect(account!.apiSecret).toBe('transparent-secret');
+    });
+
+    it('decrypts api_secret in list()', () => {
+      store.add({ name: 'list-test', apiKey: 'k1', apiSecret: 'list-secret' });
+
+      const accounts = store.list();
+      expect(accounts[0]!.apiSecret).toBe('list-secret');
+    });
+
+    it('decrypts api_secret in getDefault()', () => {
+      store.add({ name: 'default-test', apiKey: 'k1', apiSecret: 'default-secret' });
+
+      const account = store.getDefault();
+      expect(account!.apiSecret).toBe('default-secret');
+    });
+
+    it('auto-migrates unencrypted secrets on startup', () => {
+      // Insert a plaintext secret directly into DB
+      const dbPath = join(tempDir, 'accounts.db');
+      const rawDb = new Database(dbPath);
+      rawDb.prepare('INSERT INTO accounts (name, api_key, api_secret, is_default) VALUES (?, ?, ?, ?)').run('legacy', 'old-key', 'plaintext-secret', 1);
+      rawDb.close();
+
+      // Re-open store which triggers migration
+      store.close();
+      store = new AccountStore(tempDir);
+
+      // Verify the secret is now encrypted in raw DB
+      const rawDb2 = new Database(dbPath, { readonly: true });
+      const row = rawDb2.prepare('SELECT api_secret FROM accounts WHERE name = ?').get('legacy') as { api_secret: string };
+      rawDb2.close();
+
+      expect(isEncrypted(row.api_secret)).toBe(true);
+
+      // Verify it decrypts correctly
+      const account = store.get('legacy');
+      expect(account!.apiSecret).toBe('plaintext-secret');
+    });
+
+    it('does not re-encrypt already encrypted secrets during migration', () => {
+      store.add({ name: 'already-enc', apiKey: 'k1', apiSecret: 'enc-secret' });
+
+      // Read the encrypted value
+      const dbPath = join(tempDir, 'accounts.db');
+      const rawDb = new Database(dbPath, { readonly: true });
+      const before = rawDb.prepare('SELECT api_secret FROM accounts WHERE name = ?').get('already-enc') as { api_secret: string };
+      rawDb.close();
+
+      // Re-open store (triggers migration)
+      store.close();
+      store = new AccountStore(tempDir);
+
+      // Read again - should be unchanged
+      const rawDb2 = new Database(dbPath, { readonly: true });
+      const after = rawDb2.prepare('SELECT api_secret FROM accounts WHERE name = ?').get('already-enc') as { api_secret: string };
+      rawDb2.close();
+
+      expect(after.api_secret).toBe(before.api_secret);
+    });
   });
 });
