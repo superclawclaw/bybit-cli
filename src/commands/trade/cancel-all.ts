@@ -17,12 +17,14 @@ export async function cancelAllOrders(
   client: RestClientV5,
   params: CancelAllOrdersParams,
 ): Promise<void> {
-  const requestParams: { category: 'linear'; symbol?: string } = {
+  const requestParams: { category: 'linear'; symbol?: string; settleCoin?: string } = {
     category: params.category as 'linear',
   };
 
   if (params.coin) {
     requestParams.symbol = toSymbol(params.coin, params.category);
+  } else if (params.category === 'linear') {
+    requestParams.settleCoin = 'USDT';
   }
 
   const response = await client.cancelAllOrders(requestParams);

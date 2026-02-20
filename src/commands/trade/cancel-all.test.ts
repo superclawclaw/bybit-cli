@@ -28,12 +28,13 @@ describe('cancelAllOrders', () => {
 
     await cancelAllOrders(mockClient as never, {
       coin: 'BTC',
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
       jsonOutput: false,
     });
 
     expect(mockClient.cancelAllOrders).toHaveBeenCalledWith({
-      category: 'linear',
+      category: "linear",
       symbol: 'BTCUSDT',
     });
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('2 order(s)'));
@@ -52,12 +53,14 @@ describe('cancelAllOrders', () => {
 
     await cancelAllOrders(mockClient as never, {
       coin: undefined,
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
       jsonOutput: false,
     });
 
     expect(mockClient.cancelAllOrders).toHaveBeenCalledWith({
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
     });
     expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('1 order(s)'));
   });
@@ -75,7 +78,8 @@ describe('cancelAllOrders', () => {
 
     await cancelAllOrders(mockClient as never, {
       coin: 'BTC',
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
       jsonOutput: true,
     });
 
@@ -96,7 +100,8 @@ describe('cancelAllOrders', () => {
 
     await cancelAllOrders(mockClient as never, {
       coin: 'BTC',
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
       jsonOutput: false,
     });
 
@@ -114,7 +119,8 @@ describe('cancelAllOrders', () => {
 
     await cancelAllOrders(mockClient as never, {
       coin: 'BTC',
-      category: 'linear',
+      category: "linear",
+      settleCoin: "USDT",
       jsonOutput: false,
     });
 
