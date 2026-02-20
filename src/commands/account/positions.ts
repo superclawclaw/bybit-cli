@@ -31,7 +31,10 @@ export async function fetchAndDisplayPositions(
   category: Category | string,
   jsonOutput: boolean,
 ): Promise<void> {
-  const response = await client.getPositionInfo({ category: category as 'linear' | 'inverse' });
+  const response = await client.getPositionInfo({
+    category: category as 'linear' | 'inverse',
+    settleCoin: category === 'linear' ? 'USDT' : undefined,
+  });
 
   if (response.retCode !== 0) {
     console.error(`API error: ${response.retMsg}`);

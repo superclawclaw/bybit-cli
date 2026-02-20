@@ -43,7 +43,10 @@ export async function fetchAndDisplayOrders(
   category: Category | string,
   jsonOutput: boolean,
 ): Promise<void> {
-  const response = await client.getActiveOrders({ category: category as 'linear' | 'inverse' | 'spot' | 'option' });
+  const response = await client.getActiveOrders({
+    category: category as 'linear' | 'inverse' | 'spot' | 'option',
+    settleCoin: category === 'linear' ? 'USDT' : undefined,
+  });
 
   if (response.retCode !== 0) {
     console.error(`API error: ${response.retMsg}`);
