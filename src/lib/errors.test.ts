@@ -132,6 +132,57 @@ describe('formatError', () => {
   });
 });
 
+describe('secret redaction (security)', () => {
+  it('never leaks API secret from bybit-api error objects', () => {
+    // bybit-api throws plain objects like this on HTTP errors
+    const bybitError = {
+      code: 403,
+      message: 'Forbidden',
+      body: '<html>blocked</html>',
+      headers: { server: 'CloudFront' },
+      requestOptions: {
+        key: 'KKB5kZQ61lY6gU3tAs',
+        secret: 'fuohvnPnrGUTkcXi46PXDvM0oJV6LOXKv3SW',
+        testnet: false,
+      },
+    };
+    const jsonOut = formatErrorJson(bybitError);
+    const textOut = formatError(bybitError);
+
+    // Must not contain the secret value anywhere
+    expect(jsonOut).not.toContain('fuohvnPnrGUTkcXi46PXDvM0oJV6LOXKv3SW');
+    expect(textOut).not.toContain('fuohvnPnrGUTkcXi46PXDvM0oJV6LOXKv3SW');
+    // Must not contain the key value either
+    expect(jsonOut).not.toContain('KKB5kZQ61lY6gU3tAs');
+    expect(textOut).not.toContain('KKB5kZQ61lY6gU3tAs');
+  });
+
+  it('maps 403 to GEO_BLOCKED with helpful suggestion', () => {
+    const bybitError = { code: 403, message: 'Forbidden' };
+    const json = formatErrorJson(bybitError);
+    const parsed = JSON.parse(json);
+    expect(parsed.code).toBe('GEO_BLOCKED');
+    expect(parsed.suggestion).toContain('VPN');
+  });
+
+  it('maps 429 to RATE_LIMIT', () => {
+    const bybitError = { code: 429, message: 'Too Many Requests' };
+    const json = formatErrorJson(bybitError);
+    const parsed = JSON.parse(json);
+    expect(parsed.code).toBe('RATE_LIMIT');
+  });
+
+  it('sanitizes nested secrets in unknown error objects', () => {
+    const weirdError = {
+      info: 'something',
+      nested: { apiSecret: 'supersecret123', data: 'safe' },
+    };
+    const json = formatErrorJson(weirdError);
+    expect(json).not.toContain('supersecret123');
+    expect(json).toContain('[REDACTED]');
+  });
+});
+
 describe('formatErrorJson', () => {
   it('returns structured JSON error', () => {
     const err = new ApiKeyNotFoundError();
