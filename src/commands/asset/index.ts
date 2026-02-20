@@ -8,6 +8,15 @@ import { fetchAndDisplayFunding } from './funding.js';
 import { transformTickerUpdate, transformOrderbookUpdate } from './watch.js';
 import { buildWatchConfig } from '../../cli/ink/WatchApp.js';
 
+/** Normalize symbol: BTC → BTCUSDT, BTCUSDT → BTCUSDT (no double suffix) */
+function normalizeSymbol(raw: string): string {
+  const upper = raw.toUpperCase();
+  if (upper.endsWith('USDT') || upper.endsWith('USD') || upper.endsWith('PERP')) {
+    return upper;
+  }
+  return `${upper}USDT`;
+}
+
 export function createAssetCommand(): Command {
   const asset = new Command('asset').description('Asset price data and order book');
 
@@ -19,7 +28,7 @@ export function createAssetCommand(): Command {
     .action(async (rawSymbol: string, opts: { watch?: boolean }) => {
       const config = getConfig(asset.parent?.opts() ?? {});
       const symbol = validateSymbol(rawSymbol);
-      const fullSymbol = `${symbol}USDT`;
+      const fullSymbol = normalizeSymbol(symbol);
       if (opts.watch) {
         const { renderComponent } = await import('../../cli/ink/render.js');
         const { WatchApp } = await import('../../cli/ink/WatchApp.js');
@@ -58,7 +67,7 @@ export function createAssetCommand(): Command {
     .action(async (rawSymbol: string, opts: { limit: string; watch?: boolean }) => {
       const config = getConfig(asset.parent?.opts() ?? {});
       const symbol = validateSymbol(rawSymbol);
-      const fullSymbol = `${symbol}USDT`;
+      const fullSymbol = normalizeSymbol(symbol);
       const limit = Number(opts.limit) || 25;
       if (opts.watch) {
         const { renderComponent } = await import('../../cli/ink/render.js');
@@ -96,7 +105,7 @@ export function createAssetCommand(): Command {
       const config = getConfig(asset.parent?.opts() ?? {});
       const symbol = validateSymbol(rawSymbol);
       const client = createRestClient({ testnet: config.testnet });
-      await fetchAndDisplayFunding(client, `${symbol}USDT`, config.category, config.jsonOutput);
+      await fetchAndDisplayFunding(client, normalizeSymbol(symbol), config.category, config.jsonOutput);
     });
 
   return asset;
