@@ -2,7 +2,7 @@
 
 ## Project Overview
 Build a Bybit DEX CLI tool modeled after [hyperliquid-cli](https://github.com/chrisling-dev/hyperliquid-cli).
-Command name: `bb` (short for Bybit, like `hl` is for Hyperliquid).
+Command name: `bbt` (short for Bybit, like `hl` is for Hyperliquid).
 
 ## Tech Stack
 - **Language**: TypeScript (strict mode)
@@ -61,29 +61,29 @@ bybit-cli/
 
 ### 1. Command Structure
 ```bash
-bb account add              # Interactive account setup
-bb account ls               # List accounts
-bb account positions [-w]   # Positions (watch mode)
-bb account orders [-w]      # Open orders (watch mode)
-bb account balances [-w]    # Balances (watch mode)
-bb account portfolio [-w]   # Combined view
+bbt account add              # Interactive account setup
+bbt account ls               # List accounts
+bbt account positions [-w]   # Positions (watch mode)
+bbt account orders [-w]      # Open orders (watch mode)
+bbt account balances [-w]    # Balances (watch mode)
+bbt account portfolio [-w]   # Combined view
 
-bb trade order limit buy 0.001 BTC 85000
-bb trade order market buy 0.001 BTC
-bb trade order stop-loss sell 0.001 BTC 48000 49000
-bb trade order take-profit sell 0.001 BTC 55000 54000
-bb trade cancel <orderId>
-bb trade cancel-all [--coin BTC]
-bb trade set-leverage BTC 10 [--isolated]
-bb trade amend <orderId> [--price 86000] [--qty 0.002]  # Bybit exclusive
+bbt trade order limit buy 0.001 BTC 85000
+bbt trade order market buy 0.001 BTC
+bbt trade order stop-loss sell 0.001 BTC 48000 49000
+bbt trade order take-profit sell 0.001 BTC 55000 54000
+bbt trade cancel <orderId>
+bbt trade cancel-all [--coin BTC]
+bbt trade set-leverage BTC 10 [--isolated]
+bbt trade amend <orderId> [--price 86000] [--qty 0.002]  # Bybit exclusive
 
-bb markets ls [--category linear|spot|inverse|option]
-bb markets prices
-bb markets tickers BTC
+bbt markets ls [--category linear|spot|inverse|option]
+bbt markets prices
+bbt markets tickers BTC
 
-bb asset price BTC [-w]
-bb asset book BTC [-w]
-bb asset funding BTC          # Bybit: funding rate history
+bbt asset price BTC [-w]
+bbt asset book BTC [-w]
+bbt asset funding BTC          # Bybit: funding rate history
 ```
 
 ### 2. Global Options
@@ -148,11 +148,11 @@ const theme = {
 ## Phase 1 Deliverables (MVP Read-Only)
 1. Project setup (package.json, tsconfig, etc.)
 2. Account management (add, ls, remove, set-default)
-3. `bb account balances` (REST + watch mode)
-4. `bb account positions` (REST + watch mode)
-5. `bb account orders` (REST + watch mode)
-6. `bb markets ls` and `bb markets prices`
-7. `bb asset price <coin>` with watch mode
-8. `bb asset book <coin>` with watch mode
+3. `bbt account balances` (REST + watch mode)
+4. `bbt account positions` (REST + watch mode)
+5. `bbt account orders` (REST + watch mode)
+6. `bbt markets ls` and `bbt markets prices`
+7. `bbt asset price <coin>` with watch mode
+8. `bbt asset book <coin>` with watch mode
 9. `--json` output for all commands
 10. Beautiful Ink TUI for watch mode

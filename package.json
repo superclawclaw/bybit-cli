@@ -4,7 +4,7 @@
   "description": "Command-line interface for Bybit exchange with multi-account management, real-time monitoring, and full trading support",
   "type": "module",
   "bin": {
-    "bb": "./dist/index.js"
+    "bbt": "./dist/index.js"
   },
   "files": [
     "dist",

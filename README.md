@@ -27,22 +27,22 @@ Requires Node.js >= 18.
 
 ```bash
 # 1. Add your account (interactive wizard)
-bb account add
+bbt account add
 
 # 2. Or add directly with arguments
-bb account add main YOUR_API_KEY YOUR_API_SECRET
+bbt account add main YOUR_API_KEY YOUR_API_SECRET
 
 # 3. Check your balance
-bb account balances
+bbt account balances
 
 # 4. View market prices
-bb markets prices
+bbt markets prices
 
 # 5. Place a limit order (testnet)
-bb --testnet trade order limit buy 0.001 BTC 85000
+bbt --testnet trade order limit buy 0.001 BTC 85000
 
 # 6. Check positions
-bb account positions
+bbt account positions
 ```
 
 ## Global Options
@@ -67,7 +67,7 @@ Manage multiple trading accounts. Credentials are stored in an encrypted SQLite 
 Interactive wizard (recommended):
 
 ```bash
-bb account add
+bbt account add
 ```
 
 The wizard prompts for name, API key, and API secret (hidden input), tests connectivity, and offers to set as default.
@@ -75,26 +75,26 @@ The wizard prompts for name, API key, and API secret (hidden input), tests conne
 Direct mode:
 
 ```bash
-bb account add <name> <apiKey> <apiSecret>
+bbt account add <name> <apiKey> <apiSecret>
 ```
 
 ### List Accounts
 
 ```bash
-bb account ls
-bb account ls --json
+bbt account ls
+bbt account ls --json
 ```
 
 ### Set Default Account
 
 ```bash
-bb account set-default <name>
+bbt account set-default <name>
 ```
 
 ### Remove Account
 
 ```bash
-bb account remove <name>
+bbt account remove <name>
 ```
 
 ---
@@ -104,8 +104,8 @@ bb account remove <name>
 ### Balances
 
 ```bash
-bb account balances
-bb account balances --json
+bbt account balances
+bbt account balances --json
 ```
 
 Shows wallet balances with columns: Coin, Equity, Available, Unrealised PnL.
@@ -113,8 +113,8 @@ Shows wallet balances with columns: Coin, Equity, Available, Unrealised PnL.
 ### Positions
 
 ```bash
-bb account positions
-bb account positions --json
+bbt account positions
+bbt account positions --json
 ```
 
 Shows open positions: Symbol, Side, Size, Entry, Mark, Unrealised PnL, Leverage.
@@ -122,8 +122,8 @@ Shows open positions: Symbol, Side, Size, Entry, Mark, Unrealised PnL, Leverage.
 ### Orders
 
 ```bash
-bb account orders
-bb account orders --json
+bbt account orders
+bbt account orders --json
 ```
 
 Shows open orders: Order ID, Symbol, Side, Type, Price, Qty, Status, Created.
@@ -131,8 +131,8 @@ Shows open orders: Order ID, Symbol, Side, Type, Price, Qty, Status, Created.
 ### Portfolio
 
 ```bash
-bb account portfolio
-bb account portfolio --json
+bbt account portfolio
+bbt account portfolio --json
 ```
 
 Combined view of balances and positions in a single display.
@@ -146,12 +146,12 @@ All trade commands require an authenticated account.
 ### Limit Order
 
 ```bash
-bb trade order limit <side> <size> <coin> <price>
+bbt trade order limit <side> <size> <coin> <price>
 
 # Examples
-bb trade order limit buy 0.001 BTC 85000
-bb trade order limit sell 0.1 ETH 3500 --tif IOC
-bb trade order limit buy 1 SOL 100 --reduce-only
+bbt trade order limit buy 0.001 BTC 85000
+bbt trade order limit sell 0.1 ETH 3500 --tif IOC
+bbt trade order limit buy 1 SOL 100 --reduce-only
 ```
 
 | Option | Description |
@@ -162,11 +162,11 @@ bb trade order limit buy 1 SOL 100 --reduce-only
 ### Market Order
 
 ```bash
-bb trade order market <side> <size> <coin>
+bbt trade order market <side> <size> <coin>
 
 # Examples
-bb trade order market buy 0.001 BTC
-bb trade order market sell 0.1 ETH --reduce-only
+bbt trade order market buy 0.001 BTC
+bbt trade order market sell 0.1 ETH --reduce-only
 ```
 
 | Option | Description |
@@ -176,10 +176,10 @@ bb trade order market sell 0.1 ETH --reduce-only
 ### Stop-Loss Order
 
 ```bash
-bb trade order stop-loss <side> <size> <coin> <price> <trigger>
+bbt trade order stop-loss <side> <size> <coin> <price> <trigger>
 
 # Example
-bb trade order stop-loss sell 0.001 BTC 48000 49000
+bbt trade order stop-loss sell 0.001 BTC 48000 49000
 ```
 
 | Option | Description |
@@ -189,10 +189,10 @@ bb trade order stop-loss sell 0.001 BTC 48000 49000
 ### Take-Profit Order
 
 ```bash
-bb trade order take-profit <side> <size> <coin> <price> <trigger>
+bbt trade order take-profit <side> <size> <coin> <price> <trigger>
 
 # Example
-bb trade order take-profit sell 0.001 BTC 55000 54000
+bbt trade order take-profit sell 0.001 BTC 55000 54000
 ```
 
 | Option | Description |
@@ -202,33 +202,33 @@ bb trade order take-profit sell 0.001 BTC 55000 54000
 ### Cancel Order
 
 ```bash
-bb trade cancel <orderId> --coin <symbol>
+bbt trade cancel <orderId> --coin <symbol>
 
 # Example
-bb trade cancel 1234567890 --coin BTC
+bbt trade cancel 1234567890 --coin BTC
 ```
 
 ### Cancel All Orders
 
 ```bash
 # Cancel all open orders
-bb trade cancel-all
+bbt trade cancel-all
 
 # Cancel all orders for a specific coin
-bb trade cancel-all --coin BTC
+bbt trade cancel-all --coin BTC
 
 # Skip confirmation
-bb trade cancel-all -y
+bbt trade cancel-all -y
 ```
 
 ### Set Leverage
 
 ```bash
-bb trade set-leverage <coin> <leverage>
+bbt trade set-leverage <coin> <leverage>
 
 # Examples
-bb trade set-leverage BTC 10
-bb trade set-leverage ETH 5
+bbt trade set-leverage BTC 10
+bbt trade set-leverage ETH 5
 ```
 
 ### Amend Order
@@ -236,12 +236,12 @@ bb trade set-leverage ETH 5
 Modify price or quantity of an existing order (Bybit exclusive feature).
 
 ```bash
-bb trade amend <orderId> --coin <symbol> [--price <price>] [--qty <qty>]
+bbt trade amend <orderId> --coin <symbol> [--price <price>] [--qty <qty>]
 
 # Examples
-bb trade amend 1234567890 --coin BTC --price 86000
-bb trade amend 1234567890 --coin BTC --qty 0.002
-bb trade amend 1234567890 --coin BTC --price 86000 --qty 0.002
+bbt trade amend 1234567890 --coin BTC --price 86000
+bbt trade amend 1234567890 --coin BTC --qty 0.002
+bbt trade amend 1234567890 --coin BTC --price 86000 --qty 0.002
 ```
 
 At least one of `--price` or `--qty` must be specified.
@@ -255,8 +255,8 @@ No authentication required.
 ### List Instruments
 
 ```bash
-bb markets ls
-bb markets ls --category spot --json
+bbt markets ls
+bbt markets ls --category spot --json
 ```
 
 Shows: Symbol, Base, Quote, Status, Max Leverage.
@@ -264,8 +264,8 @@ Shows: Symbol, Base, Quote, Status, Max Leverage.
 ### Prices
 
 ```bash
-bb markets prices
-bb markets prices --json
+bbt markets prices
+bbt markets prices --json
 ```
 
 Shows: Symbol, Last Price, 24h Change, 24h Volume.
@@ -273,11 +273,11 @@ Shows: Symbol, Last Price, 24h Change, 24h Volume.
 ### Ticker Detail
 
 ```bash
-bb markets tickers <symbol>
+bbt markets tickers <symbol>
 
 # Example
-bb markets tickers BTC
-bb markets tickers ETH --json
+bbt markets tickers BTC
+bbt markets tickers ETH --json
 ```
 
 Shows: Symbol, Last, High 24h, Low 24h, 24h %, Volume, Bid, Ask.
@@ -291,8 +291,8 @@ No authentication required.
 ### Price
 
 ```bash
-bb asset price <coin>
-bb asset price BTC --json
+bbt asset price <coin>
+bbt asset price BTC --json
 ```
 
 Shows: Symbol, Last Price, Index Price, Mark Price, 24h Change.
@@ -300,8 +300,8 @@ Shows: Symbol, Last Price, Index Price, Mark Price, 24h Change.
 ### Order Book
 
 ```bash
-bb asset book <coin>
-bb asset book BTC --limit 10 --json
+bbt asset book <coin>
+bbt asset book BTC --limit 10 --json
 ```
 
 | Option | Description |
@@ -311,8 +311,8 @@ bb asset book BTC --limit 10 --json
 ### Funding Rate
 
 ```bash
-bb asset funding <coin>
-bb asset funding BTC --json
+bbt asset funding <coin>
+bbt asset funding BTC --json
 ```
 
 Shows the latest funding rate history for a symbol.
@@ -324,9 +324,9 @@ Shows the latest funding rate history for a symbol.
 Use `--testnet` with any command to target Bybit's testnet environment:
 
 ```bash
-bb --testnet account balances
-bb --testnet trade order limit buy 0.001 BTC 85000
-bb --testnet markets prices
+bbt --testnet account balances
+bbt --testnet trade order limit buy 0.001 BTC 85000
+bbt --testnet markets prices
 ```
 
 Create testnet API keys at [testnet.bybit.com](https://testnet.bybit.com/).
@@ -339,16 +339,16 @@ All commands support `--json` for machine-readable output:
 
 ```bash
 # Get BTC price
-bb asset price BTC --json | jq '.lastPrice'
+bbt asset price BTC --json | jq '.lastPrice'
 
 # Get all positions as JSON
-bb account positions --json | jq '.[] | {symbol, size, unrealisedPnl}'
+bbt account positions --json | jq '.[] | {symbol, size, unrealisedPnl}'
 
 # Check open orders for BTC
-bb account orders --json | jq '.[] | select(.symbol | startswith("BTC"))'
+bbt account orders --json | jq '.[] | select(.symbol | startswith("BTC"))'
 
 # Place order and capture result
-RESULT=$(bb trade order limit buy 0.001 BTC 85000 --json)
+RESULT=$(bbt trade order limit buy 0.001 BTC 85000 --json)
 ORDER_ID=$(echo "$RESULT" | jq -r '.orderId')
 echo "Placed order: $ORDER_ID"
 ```

@@ -1,10 +1,10 @@
 # Bybit CLI Skills for AI Agents
 
-This document describes how AI agents can use the `bb` command-line tool to interact with Bybit exchange.
+This document describes how AI agents can use the `bbt` command-line tool to interact with Bybit exchange.
 
 ## Overview
 
-The `bb` CLI provides programmatic access to Bybit trading across linear perpetuals, spot, inverse, and options markets. Use this tool when users want to:
+The `bbt` CLI provides programmatic access to Bybit trading across linear perpetuals, spot, inverse, and options markets. Use this tool when users want to:
 
 - Check cryptocurrency prices, market data, or order books
 - View trading positions, balances, or open orders
@@ -14,8 +14,8 @@ The `bb` CLI provides programmatic access to Bybit trading across linear perpetu
 
 ## Prerequisites
 
-- The `bb` command must be installed and available in PATH (`npm install -g bybit-cli`)
-- For trading commands: an account must be configured via `bb account add`
+- The `bbt` command must be installed and available in PATH (`npm install -g bybit-cli`)
+- For trading commands: an account must be configured via `bbt account add`
 - For testnet: add `--testnet` flag to any command
 - API keys are created at [bybit.com](https://www.bybit.com/) or [testnet.bybit.com](https://testnet.bybit.com/)
 
@@ -34,12 +34,12 @@ All commands support these options:
 
 ### Account Commands (Authentication Required)
 
-#### `bb account balances`
+#### `bbt account balances`
 
 Get wallet balances.
 
 ```bash
-bb account balances --json
+bbt account balances --json
 ```
 
 **Output (JSON):**
@@ -54,12 +54,12 @@ bb account balances --json
 ]
 ```
 
-#### `bb account positions`
+#### `bbt account positions`
 
 Get open positions.
 
 ```bash
-bb account positions --json
+bbt account positions --json
 ```
 
 **Output (JSON):**
@@ -77,12 +77,12 @@ bb account positions --json
 ]
 ```
 
-#### `bb account orders`
+#### `bbt account orders`
 
 Get open orders.
 
 ```bash
-bb account orders --json
+bbt account orders --json
 ```
 
 **Output (JSON):**
@@ -101,23 +101,23 @@ bb account orders --json
 ]
 ```
 
-#### `bb account portfolio`
+#### `bbt account portfolio`
 
 Get combined balances and positions.
 
 ```bash
-bb account portfolio --json
+bbt account portfolio --json
 ```
 
 ### Markets Commands (No Authentication Required)
 
-#### `bb markets ls`
+#### `bbt markets ls`
 
 List all available instruments.
 
 ```bash
-bb markets ls --json
-bb markets ls --category spot --json
+bbt markets ls --json
+bbt markets ls --category spot --json
 ```
 
 **Output (JSON):**
@@ -133,12 +133,12 @@ bb markets ls --category spot --json
 ]
 ```
 
-#### `bb markets prices`
+#### `bbt markets prices`
 
 Get prices for all tickers.
 
 ```bash
-bb markets prices --json
+bbt markets prices --json
 ```
 
 **Output (JSON):**
@@ -153,12 +153,12 @@ bb markets prices --json
 ]
 ```
 
-#### `bb markets tickers <symbol>`
+#### `bbt markets tickers <symbol>`
 
 Get detailed ticker for a specific symbol.
 
 ```bash
-bb markets tickers BTC --json
+bbt markets tickers BTC --json
 ```
 
 **Output (JSON):**
@@ -177,12 +177,12 @@ bb markets tickers BTC --json
 
 ### Asset Commands (No Authentication Required)
 
-#### `bb asset price <coin>`
+#### `bbt asset price <coin>`
 
 Get price of a specific asset.
 
 ```bash
-bb asset price BTC --json
+bbt asset price BTC --json
 ```
 
 **Output (JSON):**
@@ -196,13 +196,13 @@ bb asset price BTC --json
 }
 ```
 
-#### `bb asset book <coin>`
+#### `bbt asset book <coin>`
 
 Get order book.
 
 ```bash
-bb asset book BTC --json
-bb asset book BTC --limit 10 --json
+bbt asset book BTC --json
+bbt asset book BTC --limit 10 --json
 ```
 
 **Output (JSON):**
@@ -219,12 +219,12 @@ bb asset book BTC --limit 10 --json
 }
 ```
 
-#### `bb asset funding <coin>`
+#### `bbt asset funding <coin>`
 
 Get funding rate history.
 
 ```bash
-bb asset funding BTC --json
+bbt asset funding BTC --json
 ```
 
 **Output (JSON):**
@@ -240,14 +240,14 @@ bb asset funding BTC --json
 
 ### Trade Commands (Authentication Required)
 
-#### `bb trade order limit <side> <size> <coin> <price>`
+#### `bbt trade order limit <side> <size> <coin> <price>`
 
 Place a limit order.
 
 ```bash
-bb trade order limit buy 0.001 BTC 85000 --json
-bb trade order limit sell 0.1 ETH 3500 --tif IOC --json
-bb trade order limit buy 1 SOL 100 --reduce-only --json
+bbt trade order limit buy 0.001 BTC 85000 --json
+bbt trade order limit sell 0.1 ETH 3500 --tif IOC --json
+bbt trade order limit buy 1 SOL 100 --reduce-only --json
 ```
 
 | Option | Values | Description |
@@ -263,69 +263,69 @@ bb trade order limit buy 1 SOL 100 --reduce-only --json
 }
 ```
 
-#### `bb trade order market <side> <size> <coin>`
+#### `bbt trade order market <side> <size> <coin>`
 
 Place a market order.
 
 ```bash
-bb trade order market buy 0.001 BTC --json
-bb trade order market sell 0.1 ETH --reduce-only --json
+bbt trade order market buy 0.001 BTC --json
+bbt trade order market sell 0.1 ETH --reduce-only --json
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--reduce-only` | Only reduce position |
 
-#### `bb trade order stop-loss <side> <size> <coin> <price> <trigger>`
+#### `bbt trade order stop-loss <side> <size> <coin> <price> <trigger>`
 
 Place a stop-loss order.
 
 ```bash
-bb trade order stop-loss sell 0.001 BTC 48000 49000 --json
+bbt trade order stop-loss sell 0.001 BTC 48000 49000 --json
 ```
 
-#### `bb trade order take-profit <side> <size> <coin> <price> <trigger>`
+#### `bbt trade order take-profit <side> <size> <coin> <price> <trigger>`
 
 Place a take-profit order.
 
 ```bash
-bb trade order take-profit sell 0.001 BTC 55000 54000 --json
+bbt trade order take-profit sell 0.001 BTC 55000 54000 --json
 ```
 
-#### `bb trade cancel <orderId>`
+#### `bbt trade cancel <orderId>`
 
 Cancel a specific order.
 
 ```bash
-bb trade cancel 1234567890 --coin BTC --json
+bbt trade cancel 1234567890 --coin BTC --json
 ```
 
-#### `bb trade cancel-all`
+#### `bbt trade cancel-all`
 
 Cancel all open orders.
 
 ```bash
-bb trade cancel-all --json
-bb trade cancel-all --coin BTC --json
-bb trade cancel-all -y --json
+bbt trade cancel-all --json
+bbt trade cancel-all --coin BTC --json
+bbt trade cancel-all -y --json
 ```
 
-#### `bb trade set-leverage <coin> <leverage>`
+#### `bbt trade set-leverage <coin> <leverage>`
 
 Set leverage for a symbol.
 
 ```bash
-bb trade set-leverage BTC 10 --json
+bbt trade set-leverage BTC 10 --json
 ```
 
-#### `bb trade amend <orderId>`
+#### `bbt trade amend <orderId>`
 
 Amend an existing order (Bybit exclusive).
 
 ```bash
-bb trade amend 1234567890 --coin BTC --price 86000 --json
-bb trade amend 1234567890 --coin BTC --qty 0.002 --json
-bb trade amend 1234567890 --coin BTC --price 86000 --qty 0.002 --json
+bbt trade amend 1234567890 --coin BTC --price 86000 --json
+bbt trade amend 1234567890 --coin BTC --qty 0.002 --json
+bbt trade amend 1234567890 --coin BTC --price 86000 --qty 0.002 --json
 ```
 
 At least one of `--price` or `--qty` must be specified.
@@ -336,39 +336,39 @@ At least one of `--price` or `--qty` must be specified.
 
 ```bash
 # 1. Get current price
-bb asset price BTC --json
+bbt asset price BTC --json
 
 # 2. Check order book depth
-bb asset book BTC --json
+bbt asset book BTC --json
 
 # 3. Check funding rate
-bb asset funding BTC --json
+bbt asset funding BTC --json
 ```
 
 ### Open a Long Position
 
 ```bash
 # 1. Set leverage
-bb trade set-leverage BTC 10 --json
+bbt trade set-leverage BTC 10 --json
 
 # 2. Place limit order
-bb trade order limit buy 0.001 BTC 85000 --json
+bbt trade order limit buy 0.001 BTC 85000 --json
 
 # 3. Verify order placed
-bb account orders --json
+bbt account orders --json
 
 # 4. Monitor position
-bb account positions --json
+bbt account positions --json
 ```
 
 ### Close a Position
 
 ```bash
 # Market close
-bb trade order market sell 0.001 BTC --reduce-only --json
+bbt trade order market sell 0.001 BTC --reduce-only --json
 
 # Or limit close
-bb trade order limit sell 0.001 BTC 90000 --reduce-only --json
+bbt trade order limit sell 0.001 BTC 90000 --reduce-only --json
 ```
 
 ### Set Stop-Loss and Take-Profit
@@ -377,32 +377,32 @@ bb trade order limit sell 0.001 BTC 90000 --reduce-only --json
 # After opening a long position at 85000
 
 # Stop-loss: trigger at 83000, sell at 82500
-bb trade order stop-loss sell 0.001 BTC 82500 83000 --json
+bbt trade order stop-loss sell 0.001 BTC 82500 83000 --json
 
 # Take-profit: trigger at 90000, sell at 90500
-bb trade order take-profit sell 0.001 BTC 90500 90000 --json
+bbt trade order take-profit sell 0.001 BTC 90500 90000 --json
 ```
 
 ### Amend an Order
 
 ```bash
 # Get current orders
-bb account orders --json
+bbt account orders --json
 
 # Amend the price
-bb trade amend 1234567890 --coin BTC --price 86000 --json
+bbt trade amend 1234567890 --coin BTC --price 86000 --json
 ```
 
 ### Cancel All Orders for a Coin
 
 ```bash
-bb trade cancel-all --coin BTC -y --json
+bbt trade cancel-all --coin BTC -y --json
 ```
 
 ### Full Portfolio Check
 
 ```bash
-bb account portfolio --json
+bbt account portfolio --json
 ```
 
 ### Scripting: Monitor and Act
@@ -410,12 +410,12 @@ bb account portfolio --json
 ```bash
 #!/bin/bash
 # Check BTC price and place order if below threshold
-PRICE=$(bb asset price BTC --json | jq -r '.lastPrice')
+PRICE=$(bbt asset price BTC --json | jq -r '.lastPrice')
 THRESHOLD=80000
 
 if (( $(echo "$PRICE < $THRESHOLD" | bc -l) )); then
   echo "BTC at $PRICE, placing buy order"
-  bb trade order limit buy 0.001 BTC "$PRICE" --json
+  bbt trade order limit buy 0.001 BTC "$PRICE" --json
 fi
 ```
 
@@ -424,15 +424,15 @@ fi
 Commands exit with code 1 on error and print to stderr:
 
 ```bash
-bb trade order limit buy 0.001 BTC 85000 --json 2>/dev/null
+bbt trade order limit buy 0.001 BTC 85000 --json 2>/dev/null
 # Check exit code: $?
 ```
 
 Common errors:
-- No account configured: run `bb account add` first
+- No account configured: run `bbt account add` first
 - Invalid API credentials: check key and secret
 - Insufficient margin: reduce size or add funds
-- Invalid symbol: use `bb markets ls --json` to get valid symbols
+- Invalid symbol: use `bbt markets ls --json` to get valid symbols
 - Rate limiting: retry after a short delay
 
 ## Tips for AI Agents
@@ -440,10 +440,10 @@ Common errors:
 1. **Always use `--json`** for reliable, parseable output
 2. **Check prices first** before placing orders to validate parameters
 3. **Use `jq`** to filter and extract specific fields from JSON output
-4. **Validate symbols** using `bb markets ls --json` to get valid trading pairs
+4. **Validate symbols** using `bbt markets ls --json` to get valid trading pairs
 5. **For testnet testing**, always add `--testnet` flag
 6. **Handle errors gracefully** by checking exit codes and stderr
 7. **Category matters**: use `--category spot` for spot trading, default is `linear` (perpetuals)
 8. **Coin vs symbol**: most commands accept just the coin name (e.g. `BTC`), the CLI auto-appends `USDT` for linear/inverse categories
 9. **Amend orders** instead of cancel+replace for better execution (Bybit exclusive)
-10. **Check leverage** before placing orders: `bb trade set-leverage <coin> <leverage> --json`
+10. **Check leverage** before placing orders: `bbt trade set-leverage <coin> <leverage> --json`
