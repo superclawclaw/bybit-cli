@@ -389,7 +389,7 @@ Bybit supports multiple product categories. Use `--category` to switch:
 ### Setup
 
 ```bash
-git clone https://github.com/bybit-cli/bybit-cli.git
+git clone https://github.com/superclawclaw/bybit-cli.git
 cd bybit-cli
 pnpm install
 pnpm build
